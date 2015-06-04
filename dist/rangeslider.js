@@ -1,6 +1,6 @@
 /*! rangeslider.js - v0.3.13 | (c) 2015 @andreruffert | MIT license | https://github.com/andreruffert/rangeslider.js */
 (function(factory) {
-	'use strict';
+    'use strict';
 
     if (typeof define === 'function' && define.amd) {
         // AMD. Register as an anonymous module.
@@ -13,7 +13,8 @@
         // Browser globals
         factory(jQuery);
     }
-}(function($) {
+}
+(function($) {
     'use strict';
 
     /**
@@ -27,20 +28,20 @@
     }
 
     var pluginName = 'rangeslider',
-        pluginIdentifier = 0,
-        inputrange = supportsRange(),
-        defaults = {
-            polyfill: true,
-            vertical: false,
-            rangeClass: 'rangeslider',
-            disabledClass: 'rangeslider--disabled',
-            fillClass: 'rangeslider__fill',
-            verticalClass: 'rangeslider__vertical',
-            handleClass: 'rangeslider__handle',
-            startEvent: ['mousedown', 'touchstart', 'pointerdown'],
-            moveEvent: ['mousemove', 'touchmove', 'pointermove'],
-            endEvent: ['mouseup', 'touchend', 'pointerup']
-        };
+    pluginIdentifier = 0,
+    inputrange = supportsRange(),
+    defaults = {
+        polyfill: true,
+        vertical: false,
+        rangeClass: 'rangeslider',
+        disabledClass: 'rangeslider--disabled',
+        fillClass: 'rangeslider__fill',
+        verticalClass: 'rangeslider__vertical',
+        handleClass: 'rangeslider__handle',
+        startEvent: ['mousedown', 'touchstart', 'pointerdown'],
+        moveEvent: ['mousemove', 'touchmove', 'pointermove'],
+        endEvent: ['mouseup', 'touchend', 'pointerup']
+    };
 
     /**
      * Delays a function for the given number of milliseconds, and then calls
@@ -88,8 +89,8 @@
     function isHidden(element) {
         if (element.offsetWidth === 0 ||
             element.offsetHeight === 0 ||
-            // Also Consider native `<details>` elements.
-            element.open === false) {
+                // Also Consider native `<details>` elements.
+                element.open === false) {
             return true;
         }
         return false;
@@ -103,7 +104,7 @@
      */
     function getHiddenParentNodes(element) {
         var parents = [],
-            node    = element.parentNode;
+        node    = element.parentNode;
 
         while (isHidden(node)) {
             parents.push(node);
@@ -121,9 +122,9 @@
      */
     function getDimension(element, key) {
         var hiddenParentNodes       = getHiddenParentNodes(element),
-            hiddenParentNodesLength = hiddenParentNodes.length,
-            displayProperty         = [],
-            dimension               = element[key];
+        hiddenParentNodesLength = hiddenParentNodes.length,
+        displayProperty         = [],
+        dimension               = element[key];
 
         // Used for native `<details>` elements
         function toggleOpenProperty(element) {
@@ -191,275 +192,275 @@
         this.$fill      = $('<div class="' + this.options.fillClass + '" />');
         this.$handle    = $('<div class="' + this.options.handleClass + '" />');
         this.$range     = $('<div class="' + this.options.rangeClass + '" id="' + this.identifier + '" />').insertAfter(this.$element).prepend(this.$fill, this.$handle);
-		
-		if (this.vertical)
-		{
-			this.$range.addClass(this.options.verticalClass);
-		
-        // visually hide the input
-        this.$element.css({
-            'position': 'absolute',
-            'width': '1px',
-            'height': '1px',
-            'overflow': 'hidden',
-            'opacity': '0'
-        });
 
-        // Store context
-        this.handleDown = $.proxy(this.handleDown, this);
-        this.handleMove = $.proxy(this.handleMove, this);
-        this.handleEnd  = $.proxy(this.handleEnd, this);
+        if (this.vertical){
+            this.$range.addClass(this.options.verticalClass);
 
-        this.init();
+            // visually hide the input
+            this.$element.css({
+                'position': 'absolute',
+                'width': '1px',
+                'height': '1px',
+                'overflow': 'hidden',
+                'opacity': '0'
+            });
 
-        // Attach Events
-        var _this = this;
-        this.$window.on('resize.' + this.identifier, debounce(function() {
-            // Simulate resizeEnd event.
-            delay(function() { _this.update(); }, 300);
-        }, 20));
+            // Store context
+            this.handleDown = $.proxy(this.handleDown, this);
+            this.handleMove = $.proxy(this.handleMove, this);
+            this.handleEnd  = $.proxy(this.handleEnd, this);
 
-        this.$document.on(this.startEvent, '#' + this.identifier + ':not(.' + this.options.disabledClass + ')', this.handleDown);
+            this.init();
 
-        // Listen to programmatic value changes
-        this.$element.on('change.' + this.identifier, function(e, data) {
-            if (data && data.origin === _this.identifier) {
+            // Attach Events
+            var _this = this;
+            this.$window.on('resize.' + this.identifier, debounce(function() {
+                // Simulate resizeEnd event.
+                delay(function() { _this.update(); }, 300);
+            }, 20));
+
+            this.$document.on(this.startEvent, '#' + this.identifier + ':not(.' + this.options.disabledClass + ')', this.handleDown);
+
+            // Listen to programmatic value changes
+            this.$element.on('change.' + this.identifier, function(e, data) {
+                if (data && data.origin === _this.identifier) {
+                    return;
+                }
+
+                var value = e.target.value,
+                pos = _this.getPositionFromValue(value);
+                _this.setPosition(pos);
+            });
+        }
+
+        Plugin.prototype.init = function() {
+            if (this.onInit && typeof this.onInit === 'function') {
+                this.onInit();
+            }
+            this.update();
+        };
+
+        Plugin.prototype.update = function() {
+            this.handleWidth	= getDimension(this.$handle[0], 'offsetWidth');
+            this.handleHeight	= getDimension(this.$handle[0], 'offsetHeight'); 
+            this.rangeWidth		= getDimension(this.$range[0], 'offsetWidth');
+            this.rangeHeight	= getDimension(this.$range[0], 'offsetHeight');
+            this.maxHandleX		= this.rangeWidth - this.handleWidth;
+            this.maxHandleY		= this.rangeHeight - this.handleHeight;
+            this.grabX			= this.handleWidth / 2;
+            this.grabY			= this.handleHeight / 2;
+            this.position		= this.getPositionFromValue(this.value);
+
+            // Consider disabled state
+            if (this.$element[0].disabled) {
+                this.$range.addClass(this.options.disabledClass);
+            } else {
+                this.$range.removeClass(this.options.disabledClass);
+            }
+
+            this.setPosition(this.position);
+        };
+
+        Plugin.prototype.handleDown = function(e) {
+            e.preventDefault();
+            this.$document.on(this.moveEvent, this.handleMove);
+            this.$document.on(this.endEvent, this.handleEnd);
+
+            // If we click on the handle don't set the new position
+            if ((' ' + e.target.className + ' ').replace(/[\n\t]/g, ' ').indexOf(this.options.handleClass) > -1) {
                 return;
             }
 
-            var value = e.target.value,
-                pos = _this.getPositionFromValue(value);
-            _this.setPosition(pos);
-        });
-    }
-
-    Plugin.prototype.init = function() {
-        if (this.onInit && typeof this.onInit === 'function') {
-            this.onInit();
-        }
-        this.update();
-    };
-
-    Plugin.prototype.update = function() {
-		this.handleWidth	= getDimension(this.$handle[0], 'offsetWidth');
-		this.handleHeight	= getDimension(this.$handle[0], 'offsetHeight'); 
-		this.rangeWidth		= getDimension(this.$range[0], 'offsetWidth');
-		this.rangeHeight	= getDimension(this.$range[0], 'offsetHeight');
-		this.maxHandleX		= this.rangeWidth - this.handleWidth;
-		this.maxHandleY		= this.rangeHeight - this.handleHeight;
-		this.grabX			= this.handleWidth / 2;
-		this.grabY			= this.handleHeight / 2;
-		this.position		= this.getPositionFromValue(this.value);
-		
-        // Consider disabled state
-        if (this.$element[0].disabled) {
-            this.$range.addClass(this.options.disabledClass);
-        } else {
-            this.$range.removeClass(this.options.disabledClass);
-        }
-
-        this.setPosition(this.position);
-    };
-
-    Plugin.prototype.handleDown = function(e) {
-        e.preventDefault();
-        this.$document.on(this.moveEvent, this.handleMove);
-        this.$document.on(this.endEvent, this.handleEnd);
-
-        // If we click on the handle don't set the new position
-        if ((' ' + e.target.className + ' ').replace(/[\n\t]/g, ' ').indexOf(this.options.handleClass) > -1) {
-            return;
-        }
-
-        var pos    = this.getRelativePosition(e),
-			rangeX  = this.$range[0].getBoundingClientRect().left,
+            var pos    = this.getRelativePosition(e),
+            rangeX  = this.$range[0].getBoundingClientRect().left,
             handleX = this.getPositionFromNode(this.$handle[0]) - rangeX,
             rangeY = this.$range[0].getBoundingClientRect.bottom,
             handleY = this.getPositionFromNode(this.$handle[0] - rangeY);
 
-		if (this.vertical)
-		{
-			this.setPosition(pos - this.grabY);
-			if (pos >= handleY && pos < handleY + this.handleHeight) {
-				this.grabY = pos - handleY;
-			}
-		}
-		else
-		{	
-			this.setPosition(pos - this.grabX);
-						if (pos >= handleX && pos < handleX + this.handleWidth) {
-				this.grabX = pos - handleX;
-			}
-		}
-	};
+            if (this.vertical)
+                {
+                    this.setPosition(pos - this.grabY);
+                    if (pos >= handleY && pos < handleY + this.handleHeight) {
+                        this.grabY = pos - handleY;
+                    }
+                }
+                else
+                    {	
+                        this.setPosition(pos - this.grabX);
+                        if (pos >= handleX && pos < handleX + this.handleWidth) {
+                            this.grabX = pos - handleX;
+                        }
+                    }
+        };
 
-    Plugin.prototype.handleMove = function(e) {
-        e.preventDefault();
-        
-		if (this.vertical)
-		{
-			var posY = this.getRelativePosition(e);
-			this.setPosition(posY - this.grabY);
-        }
-		else
-		{
-			var posX = this.getRelativePosition(e);
-			this.setPosition(posX - this.grabX);
-		}
-    };
+        Plugin.prototype.handleMove = function(e) {
+            e.preventDefault();
 
-    Plugin.prototype.handleEnd = function(e) {
-        e.preventDefault();
-        this.$document.off(this.moveEvent, this.handleMove);
-        this.$document.off(this.endEvent, this.handleEnd);
+            if (this.vertical)
+                {
+                    var posY = this.getRelativePosition(e);
+                    this.setPosition(posY - this.grabY);
+                }
+                else
+                    {
+                        var posX = this.getRelativePosition(e);
+                        this.setPosition(posX - this.grabX);
+                    }
+        };
 
-        // Ok we're done fire the change event
-        this.$element.trigger('change', { origin: this.identifier });
+        Plugin.prototype.handleEnd = function(e) {
+            e.preventDefault();
+            this.$document.off(this.moveEvent, this.handleMove);
+            this.$document.off(this.endEvent, this.handleEnd);
 
-        if (this.onSlideEnd && typeof this.onSlideEnd === 'function') {
-            this.onSlideEnd(this.position, this.value);
-        }
-    };
+            // Ok we're done fire the change event
+            this.$element.trigger('change', { origin: this.identifier });
 
-    Plugin.prototype.cap = function(pos, min, max) {
-        if (pos < min) { return min; }
-        if (pos > max) { return max; }
-        return pos;
-    };
+            if (this.onSlideEnd && typeof this.onSlideEnd === 'function') {
+                this.onSlideEnd(this.position, this.value);
+            }
+        };
 
-    Plugin.prototype.setPosition = function(pos) {
-        var value, maxHandle, left, bottom;
-		maxHandle = this.vertical ? this.maxHandleY : this.maxHandleX;
-        // Snapping steps
-        value	= this.getValueFromPosition(this.cap(pos, 0, maxHandle));
-        left	= this.getPositionFromValue(value);
-		bottom	= left;
-		
-        // Update ui
-        if (this.vertical)
-        {
-			this.$fill[0].style.height = (bottom + this.grabY)  + 'px';
-			this.$handle[0].style.bottom = bottom + 'px';
-        }
-        else
-        {
-			this.$fill[0].style.width = (left + this.grabX)  + 'px';
-			this.$handle[0].style.left = left + 'px';
-		}
-        
-		this.setValue(value);
+        Plugin.prototype.cap = function(pos, min, max) {
+            if (pos < min) { return min; }
+            if (pos > max) { return max; }
+            return pos;
+        };
 
-        // Update globals
-        this.position = left;
-        this.value = value;
+        Plugin.prototype.setPosition = function(pos) {
+            var value, maxHandle, left, bottom;
+            maxHandle = this.vertical ? this.maxHandleY : this.maxHandleX;
+            // Snapping steps
+            value	= this.getValueFromPosition(this.cap(pos, 0, maxHandle));
+            left	= this.getPositionFromValue(value);
+            bottom	= left;
 
-        if (this.onSlide && typeof this.onSlide === 'function') {
-            this.onSlide(left, value);
-        }
-    };
+            // Update ui
+            if (this.vertical)
+                {
+                    this.$fill[0].style.height = (bottom + this.grabY)  + 'px';
+                    this.$handle[0].style.bottom = bottom + 'px';
+                }
+                else
+                    {
+                        this.$fill[0].style.width = (left + this.grabX)  + 'px';
+                        this.$handle[0].style.left = left + 'px';
+                    }
 
-    // Returns element position relative to the parent
-    Plugin.prototype.getPositionFromNode = function(node) {
-        var i = 0;
-        while (node !== null) {
-			i += node.offsetLeft;
-			node = node.offsetParent;
-        }
-        return i;
-    };
+                    this.setValue(value);
 
-    Plugin.prototype.getRelativePosition = function(e) {
-		// Get the offset left relative to the viewport
-		var rangeX	= this.$range[0].getBoundingClientRect().left,
-			rangeY	= this.$range[0].getBoundingClientRect().bottom,
-			pageX	= 0,
-			pageY	= 0,
-			page, range, pos;
+                    // Update globals
+                    this.position = left;
+                    this.value = value;
 
-        if (typeof e.pageX !== 'undefined') {
-            pageX = e.pageX;
-            pageY = e.pageY;
-        }
-        else if (typeof e.originalEvent.clientX !== 'undefined') {
-            pageX = e.originalEvent.clientX;
-            pageY = e.originalEvent.clientY;
-        }
-        else if (e.originalEvent.touches && e.originalEvent.touches[0] && typeof e.originalEvent.touches[0].clientX !== 'undefined') {
-            pageX = e.originalEvent.touches[0].clientX;
-            pageY = e.originalEvent.touches[0].clientY;
-        }
-        else if(e.currentPoint && typeof e.currentPoint.x !== 'undefined') {
-            pageX = e.currentPoint.x;
-            pageY = e.currentPoint.x;
-        }
+                    if (this.onSlide && typeof this.onSlide === 'function') {
+                        this.onSlide(left, value);
+                    }
+        };
 
-		page = this.vertical ? pageY : pageX;
-		range = this.vertical ? rangeY : rangeX;
-		pos = this.vertical ? range - page : page - range;
-        
-        return pos;
-    };
+        // Returns element position relative to the parent
+        Plugin.prototype.getPositionFromNode = function(node) {
+            var i = 0;
+            while (node !== null) {
+                i += node.offsetLeft;
+                node = node.offsetParent;
+            }
+            return i;
+        };
 
-    Plugin.prototype.getPositionFromValue = function(value) {
-        var percentage, pos, calcVal;
-        calcVal = this.vertical ? this.maxHandleY : this.maxHandleX;
-        percentage = (value - this.min)/(this.max - this.min);
-        pos = percentage * calcVal;
-        return pos;
-    };
+        Plugin.prototype.getRelativePosition = function(e) {
+            // Get the offset left relative to the viewport
+            var rangeX	= this.$range[0].getBoundingClientRect().left,
+            rangeY	= this.$range[0].getBoundingClientRect().bottom,
+            pageX	= 0,
+            pageY	= 0,
+            page, range, pos;
 
-    Plugin.prototype.getValueFromPosition = function(pos) {
-        var percentage, value, calcVal;
-        calcVal = this.vertical ? this.maxHandleY : this.maxHandleX;
-        percentage = ((pos) / (calcVal || 1));
-        value = this.step * Math.round(percentage * (this.max - this.min) / this.step) + this.min;
-        return Number((value).toFixed(this.toFixed));
-    };
+            if (typeof e.pageX !== 'undefined') {
+                pageX = e.pageX;
+                pageY = e.pageY;
+            }
+            else if (typeof e.originalEvent.clientX !== 'undefined') {
+                pageX = e.originalEvent.clientX;
+                pageY = e.originalEvent.clientY;
+            }
+            else if (e.originalEvent.touches && e.originalEvent.touches[0] && typeof e.originalEvent.touches[0].clientX !== 'undefined') {
+                pageX = e.originalEvent.touches[0].clientX;
+                pageY = e.originalEvent.touches[0].clientY;
+            }
+            else if(e.currentPoint && typeof e.currentPoint.x !== 'undefined') {
+                pageX = e.currentPoint.x;
+                pageY = e.currentPoint.x;
+            }
 
-    Plugin.prototype.setValue = function(value) {
-        if (value === this.value) {
-            return;
-        }
+            page = this.vertical ? pageY : pageX;
+            range = this.vertical ? rangeY : rangeX;
+            pos = this.vertical ? range - page : page - range;
 
-        // Set the new value and fire the `input` event
-        this.$element
+            return pos;
+        };
+
+        Plugin.prototype.getPositionFromValue = function(value) {
+            var percentage, pos, calcVal;
+            calcVal = this.vertical ? this.maxHandleY : this.maxHandleX;
+            percentage = (value - this.min)/(this.max - this.min);
+            pos = percentage * calcVal;
+            return pos;
+        };
+
+        Plugin.prototype.getValueFromPosition = function(pos) {
+            var percentage, value, calcVal;
+            calcVal = this.vertical ? this.maxHandleY : this.maxHandleX;
+            percentage = ((pos) / (calcVal || 1));
+            value = this.step * Math.round(percentage * (this.max - this.min) / this.step) + this.min;
+            return Number((value).toFixed(this.toFixed));
+        };
+
+        Plugin.prototype.setValue = function(value) {
+            if (value === this.value) {
+                return;
+            }
+
+            // Set the new value and fire the `input` event
+            this.$element
             .val(value)
             .trigger('input', { origin: this.identifier });
-    };
+        };
 
-    Plugin.prototype.destroy = function() {
-        this.$document.off('.' + this.identifier);
-        this.$window.off('.' + this.identifier);
+        Plugin.prototype.destroy = function() {
+            this.$document.off('.' + this.identifier);
+            this.$window.off('.' + this.identifier);
 
-        this.$element
+            this.$element
             .off('.' + this.identifier)
             .removeAttr('style')
             .removeData('plugin_' + pluginName);
 
-        // Remove the generated markup
-        if (this.$range && this.$range.length) {
-            this.$range[0].parentNode.removeChild(this.$range[0]);
-        }
-    };
+            // Remove the generated markup
+            if (this.$range && this.$range.length) {
+                this.$range[0].parentNode.removeChild(this.$range[0]);
+            }
+        };
 
-    // A really lightweight plugin wrapper around the constructor,
-    // preventing against multiple instantiations
-    $.fn[pluginName] = function(options) {
-        return this.each(function() {
-            var $this = $(this),
+        // A really lightweight plugin wrapper around the constructor,
+        // preventing against multiple instantiations
+        $.fn[pluginName] = function(options) {
+            return this.each(function() {
+                var $this = $(this),
                 data  = $this.data('plugin_' + pluginName);
 
-            // Create a new instance.
-            if (!data) {
-                $this.data('plugin_' + pluginName, (data = new Plugin(this, options)));
-            }
+                // Create a new instance.
+                if (!data) {
+                    $this.data('plugin_' + pluginName, (data = new Plugin(this, options)));
+                }
 
-            // Make it possible to access methods from public.
-            // e.g `$element.rangeslider('method');`
-            if (typeof options === 'string') {
-                data[options]();
-            }
-        });
-    };
+                // Make it possible to access methods from public.
+                // e.g `$element.rangeslider('method');`
+                if (typeof options === 'string') {
+                    data[options]();
+                }
+            });
+        };
+    }
 
 }));
